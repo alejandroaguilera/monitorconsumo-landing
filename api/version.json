@@ -1,0 +1,8 @@
+{
+  "version": "1.1.0",
+  "build": 5,
+  "download_url": "https://monitorconsumo.mrhapps.mx/download/MonitorConsumo.zip",
+  "release_notes": "Ícono nuevo, ventana de Ajustes, actualizaciones integradas y correcciones de renovación de sesión.",
+  "published_at": "2026-07-18",
+  "min_macos": "14.0"
+}
