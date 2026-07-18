@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MonitorConsumo — Claude &amp; Codex usage limits in your Mac menu bar</title>
+<meta name="description" content="A Mac menu bar app that tells you how much you have left — of your session, your week, and your credits — before “limit reached” kills your flow.">
+<link rel="icon" type="image/png" href="/assets/app-icon-256.png">
+<link rel="apple-touch-icon" href="/assets/app-icon-256.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://monitorconsumo.mrhapps.mx/">
+<meta property="og:title" content="MonitorConsumo — Claude &amp; Codex usage limits in your Mac menu bar">
+<meta property="og:description" content="A free Mac menu bar app that shows your Claude Code and Codex usage limits in real time. No account, no tracking — your credentials never leave your Mac.">
+<meta property="og:image" content="https://monitorconsumo.mrhapps.mx/assets/panel-screenshot.png">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --text-primary: #1D1D1F;
+    --text-secondary: #6E6E73;
+    --accent: #0A84FF;
+    --accent-hover: #0060DF;
+    --gauge-green: #59C247;
+    --gauge-yellow: #FAD426;
+    --gauge-orange: #FC8F21;
+    --gauge-red: #ED3329;
+    --pill-bg: rgba(0,0,0,0.05);
+    --card-border: rgba(0,0,0,0.04);
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --divider: rgba(0,0,0,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --surface: #2C2C2E;
+      --text-primary: #F5F5F7;
+      --text-secondary: #98989D;
+      --pill-bg: rgba(255,255,255,0.08);
+      --card-border: rgba(255,255,255,0.06);
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.35);
+      --divider: rgba(255,255,255,0.12);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 96px 0; }
+
+  /* ---------- Header ---------- */
+  header { padding: 24px 0; }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; color: var(--text-primary); }
+  .brand:hover { text-decoration: none; }
+  .brand img { width: 32px; height: 32px; }
+  .nav-download {
+    font-size: 15px; font-weight: 600; color: var(--accent);
+    padding: 8px 16px; border-radius: 999px; background: var(--pill-bg);
+  }
+  .nav-download:hover { text-decoration: none; color: var(--accent-hover); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 64px 0 96px; position: relative; overflow: hidden; }
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(420px 320px at 82% 30%, rgba(89,194,71,0.16), transparent 70%),
+      radial-gradient(380px 300px at 95% 55%, rgba(250,212,38,0.13), transparent 70%),
+      radial-gradient(360px 300px at 78% 78%, rgba(252,143,33,0.12), transparent 70%),
+      radial-gradient(300px 260px at 92% 88%, rgba(237,51,41,0.10), transparent 70%);
+    filter: blur(40px);
+  }
+  .hero-inner {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.15fr 0.85fr;
+    gap: 64px; align-items: center;
+  }
+  h1 {
+    font-size: 56px; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .headline-accent {
+    background-image: linear-gradient(90deg, var(--gauge-green), var(--gauge-yellow), var(--gauge-orange), var(--gauge-red));
+    background-repeat: no-repeat;
+    background-size: 100% 5px;
+    background-position: 0 96%;
+    padding-bottom: 4px;
+  }
+  .subheadline { font-size: 21px; font-weight: 400; line-height: 1.5; color: var(--text-secondary); margin-bottom: 40px; }
+  .cta-button {
+    display: inline-block;
+    background: var(--accent); color: #FFFFFF;
+    padding: 16px 32px; border-radius: 12px;
+    font-size: 17px; font-weight: 600;
+    box-shadow: 0 4px 14px rgba(10,132,255,0.35);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .cta-button:hover { background: var(--accent-hover); text-decoration: none; color: #fff; transform: translateY(-1px); }
+  .cta-caption { font-size: 13px; line-height: 1.4; color: var(--text-secondary); margin-top: 16px; }
+  .hero-shot { display: flex; justify-content: center; }
+  .hero-shot img {
+    width: 100%; max-width: 340px;
+    border-radius: 14px;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.10);
+  }
+
+  /* ---------- Section headings ---------- */
+  h2 { font-size: 36px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 16px; }
+  .section-lead { font-size: 19px; color: var(--text-secondary); max-width: 640px; }
+
+  /* ---------- Problem ---------- */
+  .problem-list { list-style: none; margin-top: 40px; display: grid; gap: 16px; max-width: 640px; }
+  .problem-list li { display: flex; gap: 12px; align-items: flex-start; font-size: 17px; }
+  .check {
+    flex: none; width: 24px; height: 24px; margin-top: 3px;
+    border-radius: 50%; background: var(--gauge-green);
+    color: #fff; font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ---------- Features ---------- */
+  .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+  .feature-card {
+    background: var(--surface); border-radius: 18px; padding: 32px 28px;
+    border: 1px solid var(--card-border); box-shadow: var(--card-shadow);
+  }
+  .feature-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--pill-bg);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px; color: var(--accent);
+  }
+  .feature-icon svg { width: 24px; height: 24px; }
+  .feature-card h3 { font-size: 19px; font-weight: 600; margin-bottom: 8px; }
+  .feature-card p { font-size: 15px; color: var(--text-secondary); line-height: 1.55; }
+
+  /* ---------- How it works ---------- */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 64px; }
+  .step { text-align: center; padding: 0 12px; }
+  .step-num {
+    width: 44px; height: 44px; margin: 0 auto 20px;
+    border-radius: 50%; background: var(--accent); color: #fff;
+    font-size: 19px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step p { font-size: 17px; font-weight: 500; }
+  .steps-note { text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 40px; }
+
+  /* ---------- Gallery ---------- */
+  .gallery { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 64px; justify-items: center; }
+  .gallery img {
+    max-width: 360px; width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 16px 50px rgba(0,0,0,0.16), 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq-list { margin-top: 64px; max-width: 720px; }
+  .faq-list details {
+    background: var(--surface); border-radius: 18px;
+    border: 1px solid var(--card-border); box-shadow: var(--card-shadow);
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .faq-list summary {
+    cursor: pointer; list-style: none;
+    padding: 20px 24px; font-size: 17px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .faq-list summary::-webkit-details-marker { display: none; }
+  .faq-list summary::after {
+    content: "+"; font-size: 22px; font-weight: 400; color: var(--text-secondary);
+    flex: none; transition: transform 0.2s ease;
+  }
+  .faq-list details[open] summary::after { transform: rotate(45deg); }
+  .faq-list details p { padding: 0 24px 20px; font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* ---------- Bottom CTA ---------- */
+  .bottom-cta { text-align: center; }
+  .bottom-cta h2 { margin-bottom: 32px; }
+
+  /* ---------- Footer ---------- */
+  footer { border-top: 1px solid var(--divider); padding: 40px 0; font-size: 13px; color: var(--text-secondary); }
+  .footer-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 24px; flex-wrap: wrap;
+  }
+  .footer-brand { display: flex; align-items: center; gap: 10px; }
+  .footer-brand img { width: 24px; height: 24px; }
+  .footer-brand strong { color: var(--text-primary); font-weight: 600; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: var(--pill-bg); color: var(--text-secondary);
+    font-size: 13px; padding: 4px 12px; border-radius: 999px; white-space: nowrap;
+  }
+  .footer-legal { margin-top: 24px; font-size: 12px; opacity: 0.8; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 44px; }
+  }
+  @media (max-width: 680px) {
+    section { padding: 64px 0; }
+    .hero { padding: 32px 0 64px; }
+    .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+    .hero-glow {
+      background:
+        radial-gradient(320px 260px at 50% 85%, rgba(89,194,71,0.14), transparent 70%),
+        radial-gradient(280px 240px at 80% 95%, rgba(252,143,33,0.12), transparent 70%);
+    }
+    h1 { font-size: 36px; }
+    .subheadline { font-size: 19px; }
+    .features-grid, .steps { grid-template-columns: 1fr; }
+    .step { text-align: left; display: flex; align-items: center; gap: 16px; }
+    .step-num { margin: 0; flex: none; }
+    .footer-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <a class="brand" href="/">
+      <img src="/assets/app-icon-256.png" alt="MonitorConsumo icon" width="32" height="32">
+      MonitorConsumo
+    </a>
+    <a class="nav-download" href="/download/MonitorConsumo.zip" download>Download</a>
+  </div>
+</header>
+
+<!-- ============ Hero ============ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="container hero-inner">
+    <div>
+      <h1>Your Claude &amp; Codex limits, <span class="headline-accent">always in sight</span>.</h1>
+      <p class="subheadline">A Mac menu bar app that tells you how much you have left — of your session, your week, and your credits — before “limit reached” kills your flow.</p>
+      <a class="cta-button" href="/download/MonitorConsumo.zip" download>Download free for Mac</a>
+      <p class="cta-caption">macOS 14+ &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp; Notarized by Apple &nbsp;·&nbsp; 1.1 MB</p>
+    </div>
+    <div class="hero-shot">
+      <img src="/assets/panel-screenshot.png" alt="MonitorConsumo panel showing Claude Code and Codex usage limits with progress bars" width="720" height="1242">
+    </div>
+  </div>
+</section>
+
+<!-- ============ Problem ============ -->
+<section>
+  <div class="container">
+    <h2>Sound familiar?</h2>
+    <p class="section-lead">You're on a roll with Claude Code or Codex and suddenly: <em>“you've reached your limit.”</em> No warning, no idea how much you had used, no clue how long until it resets.</p>
+    <ul class="problem-list">
+      <li><span class="check">✓</span>See your remaining % right in the menu bar, without opening anything.</li>
+      <li><span class="check">✓</span>Know exactly when each limit resets (“in 2d 8h”).</li>
+      <li><span class="check">✓</span>Decide with real data whether that big task runs today or tomorrow.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ Features ============ -->
+<section>
+  <div class="container">
+    <h2>Everything you need. Nothing you don't.</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 13.5 15.5 8"/><circle cx="12" cy="14" r="1.4" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <h3>Everything at a glance</h3>
+        <p>Your 5-hour session, weekly limits (all models and per-model, like Fable) and your extra credits — with progress bars and countdowns.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M12 4v16"/><path d="M6.5 9.5h2M6.5 13h2M15.5 9.5h2M15.5 13h2"/></svg>
+        </div>
+        <h3>Claude Code &amp; Codex together</h3>
+        <p>The two services you use to code with AI, in one single panel. Show or hide each one.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H13L13 2z"/></svg>
+        </div>
+        <h3>Zero setup</h3>
+        <p>No account to create, no API keys. It detects the sessions you're already signed in to in your CLIs and works instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 5.5v5c0 4.5 3 8.2 7 9.5 4-1.3 7-5 7-9.5v-5L12 3z"/><path d="m9.2 12 2 2 3.6-4"/></svg>
+        </div>
+        <h3>Privacy first</h3>
+        <p>Your credentials never leave your Mac. The app only queries Anthropic's and OpenAI's official usage endpoints. No analytics, no middleman servers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2.2"/><circle cx="8" cy="16" r="2.2"/></svg>
+        </div>
+        <h3>Your way</h3>
+        <p>Choose what the menu bar shows, how often it refreshes, and whether it launches at login.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v4h-4"/></svg>
+        </div>
+        <h3>Always up to date</h3>
+        <p>The app tells you when a new version is out. One click and you download the update.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TODO: testimonials section when they exist -->
+
+<!-- ============ How it works ============ -->
+<section>
+  <div class="container">
+    <h2>Up and running in seconds</h2>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><p>Download and open the app.</p></div>
+      <div class="step"><div class="step-num">2</div><p>The gauge appears in your menu bar.</p></div>
+      <div class="step"><div class="step-num">3</div><p>Click it and see your limits in real time.</p></div>
+    </div>
+    <p class="steps-note">Requires being signed in to Claude Code and/or Codex CLI.</p>
+  </div>
+</section>
+
+<!-- ============ Gallery ============ -->
+<section>
+  <div class="container">
+    <h2>A closer look</h2>
+    <div class="gallery">
+      <img src="/assets/panel-screenshot.png" alt="MonitorConsumo panel in light mode" width="720" height="1242" loading="lazy">
+      <!-- TODO: añadir capturas dark + ajustes -->
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section>
+  <div class="container">
+    <h2>Frequently asked questions</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Does it run on Apple Silicon?</summary>
+        <p>Yes. The binary is universal: it runs natively on Apple Silicon (M1 and later) and on Intel Macs. Requires macOS 14 Sonoma or later.</p>
+      </details>
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes, completely free.</p>
+      </details>
+      <details>
+        <summary>Do I need to create an account?</summary>
+        <p>No. The app uses the sessions you're already signed in to in Claude Code (<code>claude</code>) and/or Codex (<code>codex</code>). If you don't use those CLIs, the app has nothing to show you.</p>
+      </details>
+      <details>
+        <summary>What about my privacy?</summary>
+        <p>Everything happens on your Mac. The app reads your CLIs' local credentials and queries only Anthropic's and OpenAI's official usage endpoints. No analytics, no tracking, no developer servers in between.</p>
+      </details>
+      <details>
+        <summary>Is it safe to install?</summary>
+        <p>Yes: it's signed with a Developer ID and notarized by Apple, which means Apple scanned the binary. It opens with a normal double-click.</p>
+      </details>
+      <details>
+        <summary>How do I get updates?</summary>
+        <p>The app itself lets you know when a new version is available and takes you to the download. You can also check for updates manually in Settings.</p>
+      </details>
+      <details>
+        <summary>Is this an official Anthropic or OpenAI app?</summary>
+        <p>No. It's an independent tool made by a solo developer; Claude and Codex are trademarks of their respective companies.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Bottom CTA ============ -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Never get cut off mid-flow again.</h2>
+    <a class="cta-button" href="/download/MonitorConsumo.zip" download>Download free for Mac</a>
+    <p class="cta-caption">macOS 14+ &nbsp;·&nbsp; Apple Silicon &amp; Intel &nbsp;·&nbsp; Notarized by Apple &nbsp;·&nbsp; 1.1 MB</p>
+  </div>
+</section>
+
+<!-- ============ Footer ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-row">
+      <div class="footer-brand">
+        <img src="/assets/app-icon-256.png" alt="" width="24" height="24">
+        <span><strong>MonitorConsumo</strong> &nbsp;·&nbsp; © 2026 Alejandro Aguilera</span>
+      </div>
+      <div class="footer-links">
+        <a href="/privacy.html">Privacy</a>
+        <a href="mailto:yo@alejandroaguilera.mx">Contact</a>
+      </div>
+      <div class="footer-badges">
+        <span class="badge">Notarized by Apple</span>
+        <span class="badge">macOS 14+</span>
+        <span class="badge">Made in Mexico 🇲🇽</span>
+      </div>
+    </div>
+    <p class="footer-legal">Claude is a trademark of Anthropic. Codex is a trademark of OpenAI. This app is not affiliated with either company.</p>
+  </div>
+</footer>
+
+</body>
+</html>

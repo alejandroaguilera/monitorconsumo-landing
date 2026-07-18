@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — MonitorConsumo</title>
+<meta name="description" content="MonitorConsumo collects no data. Your credentials never leave your Mac, and this website uses no tracking cookies.">
+<link rel="icon" type="image/png" href="/assets/app-icon-256.png">
+<style>
+  :root {
+    --bg: #F5F5F7;
+    --surface: #FFFFFF;
+    --text-primary: #1D1D1F;
+    --text-secondary: #6E6E73;
+    --accent: #0A84FF;
+    --card-border: rgba(0,0,0,0.04);
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --surface: #2C2C2E;
+      --text-primary: #F5F5F7;
+      --text-secondary: #98989D;
+      --card-border: rgba(255,255,255,0.06);
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container { max-width: 720px; margin: 0 auto; padding: 40px 24px 96px; }
+  .back { font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 40px; }
+  h1 { font-size: 36px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 40px; }
+  .card {
+    background: var(--surface); border-radius: 18px; padding: 32px;
+    border: 1px solid var(--card-border); box-shadow: var(--card-shadow);
+  }
+  .card h2 { font-size: 21px; font-weight: 600; margin-bottom: 12px; }
+  .card p { color: var(--text-secondary); margin-bottom: 24px; }
+  .card p:last-child { margin-bottom: 0; }
+  .updated { font-size: 13px; color: var(--text-secondary); margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="/">← MonitorConsumo</a>
+  <h1>Privacy</h1>
+  <div class="card">
+    <h2>The app collects no data. Period.</h2>
+    <p>MonitorConsumo runs entirely on your Mac. It reads the local credentials of the CLIs you're already signed in to (Claude Code and/or Codex) and queries only the official usage endpoints of Anthropic and OpenAI to display your limits. Your credentials never leave your Mac, and no data ever passes through servers operated by the developer.</p>
+    <p>The app contains no analytics, no tracking, and no advertising of any kind. The only network requests it makes are to Anthropic's and OpenAI's official APIs, and a daily check of a static file on this site (<code>/api/version.json</code>) to find out if a new version is available. That check sends no personal information.</p>
+    <h2>This website</h2>
+    <p>This website is a static page. It uses no cookies, no analytics, and no third-party trackers.</p>
+    <h2>Questions?</h2>
+    <p>Write to <a href="mailto:yo@alejandroaguilera.mx">yo@alejandroaguilera.mx</a>.</p>
+  </div>
+  <p class="updated">Last updated: July 2026</p>
+</div>
+</body>
+</html>
