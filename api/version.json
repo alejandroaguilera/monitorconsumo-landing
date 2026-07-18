@@ -1,8 +1,8 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "build": 5,
   "download_url": "https://monitorconsumo.mrhapps.mx/download/MonitorConsumo.zip",
-  "release_notes": "Ícono nuevo, ventana de Ajustes, actualizaciones integradas y correcciones de renovación de sesión.",
+  "release_notes": "Ventana de bienvenida en el primer arranque: indica dónde está el ícono y detecta si tienes Claude Code y Codex instalados.",
   "published_at": "2026-07-18",
   "min_macos": "14.0"
 }
