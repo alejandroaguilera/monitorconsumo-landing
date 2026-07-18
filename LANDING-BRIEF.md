@@ -193,19 +193,14 @@ Features y FAQ.)
 - `app-icon.png` — ícono maestro 1024×1024 (fondo transparente fuera del squircle).
 - `panel-screenshot.png` — captura real del panel (720×~1250 @2x, modo claro).
 
-## Estructura de despliegue en el VPS (carpeta `deploy/`)
+## Estructura de despliegue
 
-```
-monitorconsumo.mrhapps.mx/
-├── index.html            ← lo genera este brief
-├── privacidad.html       ← lo genera este brief
-├── download/
-│   └── MonitorConsumo.zip   (incluido, v1.1.0 notarizada)
-└── api/
-    └── version.json         (incluido)
-```
+**La raíz de este repositorio (github.com/alejandroaguilera/monitorconsumo-landing)
+ES la raíz del sitio** — Dokploy despliega desde aquí a monitorconsumo.mrhapps.mx.
+Genera `index.html` y `privacidad.html` en la raíz del repo; `download/`, `api/` y
+`assets/` ya existen y NO deben moverse ni renombrarse (la app instalada depende de
+`/download/MonitorConsumo.zip` y `/api/version.json`).
 
-**Flujo para publicar una actualización futura** (referencia para el dueño):
-compilar con `./build_app.sh notarize` → subir el nuevo ZIP a `/download/` con el
-mismo nombre → editar `version` y `release_notes` en `/api/version.json`. Todos los
-usuarios verán el aviso de actualización en menos de 24 h.
+**Flujo para publicar una actualización futura** (referencia para el dueño): en el
+proyecto de la app, `./publish_release.sh "notas"` hace todo — compila, notariza,
+actualiza este repo y hace push; Dokploy redespliega solo.
