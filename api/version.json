@@ -1,8 +1,8 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "build": 5,
   "download_url": "https://monitorconsumo.mrhapps.mx/download/MonitorConsumo.zip",
-  "release_notes": "Ventana de bienvenida en el primer arranque: indica dónde está el ícono y detecta si tienes Claude Code y Codex instalados.",
-  "published_at": "2026-07-18",
+  "release_notes": "Permiso del llavero solo una vez (ya no lo pide en cada arranque), opción para mostrar % usado en vez de restante, y el pie del panel refleja el intervalo de actualización elegido.",
+  "published_at": "2026-07-23",
   "min_macos": "14.0"
 }
